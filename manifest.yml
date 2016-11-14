@@ -1,0 +1,14 @@
+---
+applications:
+- name: go-web-elasticsearch
+  instances: 1
+  memory: 128M
+  host: go-web-elasticsearch
+  buildpack: https://github.com/cloudfoundry/go-buildpack.git
+  domain: de.a9sapp.eu
+  command: go-web
+  services:
+    - elasticsearch-small
+  env:
+    GOPACKAGENAME: go-web
+    GOVERSION: go1.7

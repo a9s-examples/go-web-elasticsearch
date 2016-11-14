@@ -1,0 +1,49 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "rPRI0+h7jvHTOtdZqpgSxSsUgiU=",
+			"path": "github.com/cloudfoundry-community/go-cfenv",
+			"revision": "c567d77dab8551bc4077e68e5a04415f1d74a911",
+			"revisionTime": "2016-07-25T23:41:13Z"
+		},
+		{
+			"checksumSHA1": "UuXgD2dDojfS8AViUEe15gLIWZE=",
+			"path": "github.com/mitchellh/mapstructure",
+			"revision": "f3009df150dadf309fdee4a54ed65c124afad715",
+			"revisionTime": "2016-10-20T16:18:36Z"
+		},
+		{
+			"checksumSHA1": "9jjO5GjLa0XF/nfWihF02RoH4qc=",
+			"path": "golang.org/x/net/context",
+			"revision": "9ef22118a4b25863aa94546daffbc0a18feaafb3",
+			"revisionTime": "2016-11-09T21:27:32Z"
+		},
+		{
+			"checksumSHA1": "WHc3uByvGaMcnSoI21fhzYgbOgg=",
+			"path": "golang.org/x/net/context/ctxhttp",
+			"revision": "9ef22118a4b25863aa94546daffbc0a18feaafb3",
+			"revisionTime": "2016-11-09T21:27:32Z"
+		},
+		{
+			"checksumSHA1": "hq70/JJzoGeeUBar71Wif+Jqu74=",
+			"path": "gopkg.in/olivere/elastic.v5",
+			"revision": "ee3ebceab960cf68ab9a89ee6d78c031ef5b4a4e",
+			"revisionTime": "2016-11-06T13:31:42Z"
+		},
+		{
+			"checksumSHA1": "4o4sDuhMGKUOvovqg1yKGNjaeJU=",
+			"path": "gopkg.in/olivere/elastic.v5/backoff",
+			"revision": "ee3ebceab960cf68ab9a89ee6d78c031ef5b4a4e",
+			"revisionTime": "2016-11-06T13:31:42Z"
+		},
+		{
+			"checksumSHA1": "pCApZfp2CeDnWbNVsyzNO62ZUXA=",
+			"path": "gopkg.in/olivere/elastic.v5/uritemplates",
+			"revision": "ee3ebceab960cf68ab9a89ee6d78c031ef5b4a4e",
+			"revisionTime": "2016-11-06T13:31:42Z"
+		}
+	],
+	"rootPath": "github.com/a9s-examples/go-web-elasticsearch"
+}
