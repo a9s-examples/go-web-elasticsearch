@@ -25,7 +25,44 @@ type Tweet struct {
 	Suggest  *elastic.SuggestField `json:"suggest_field,omitempty"`
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
+type Credentials struct {
+	Username string
+	Password string
+	Host     string
+}
+
+func parseCredentials() (credentials Credentials, err error) {
+	type Cred struct {
+		Username string
+		Password string
+		Host     []string
+	}
+
+	var md mapstructure.Metadata
+	var result Cred
+	config := &mapstructure.DecoderConfig{
+		Metadata: &md,
+		Result:   &result,
+	}
+	decoder, err := mapstructure.NewDecoder(config)
+	if err != nil {
+		return
+	}
+
+	if err = decoder.Decode(rawServiceCredentials()); err != nil {
+		return
+	}
+
+	u := "http://" + result.Host[0]
+
+	credentials.Username = result.Username
+	credentials.Password = result.Password
+	credentials.Host = u
+
+	return
+}
+
+func rawServiceCredentials() map[string]interface{} {
 	var service cfenv.Service
 
 	appEnv, errCfenv := cfenv.Current()
@@ -38,54 +75,49 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	vcapServices := os.Getenv("VCAP_SERVICES")
+	return service.Credentials
+}
 
-	errDbMsg := ""
-	msg := ""
-
-	values := []int{}
-
-	type Cred struct {
-		Username string
-		Password string
-		Host     []string
-	}
-	var md mapstructure.Metadata
-	var result Cred
-	config := &mapstructure.DecoderConfig{
-		Metadata: &md,
-		Result:   &result,
-	}
-	decoder, err := mapstructure.NewDecoder(config)
-	if err != nil {
-		panic(err)
-	}
-
-	if err := decoder.Decode(service.Credentials); err != nil {
-		panic(err)
-	}
-
-	u := "http://" + result.Host[0]
-
-	msg += u
-	msg += "\n"
-
+func httpGetRequest(credentials Credentials) (string, error) {
 	c := &http.Client{}
-	req, err := http.NewRequest("GET", u, nil)
-	req.SetBasicAuth(result.Username, result.Password)
+	req, err := http.NewRequest("GET", credentials.Host, nil)
+	req.SetBasicAuth(credentials.Username, credentials.Password)
+
 	resp, err := c.Do(req)
 	if err != nil {
+		return "", err
 		// handle error
 	}
 	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
-	msg += fmt.Sprintf("resp.Code = %s\n", resp.Status)
+	msg := fmt.Sprintf("resp.Code = %s\n", resp.Status)
 	msg += fmt.Sprintf("body = %s\n", body)
 
+	return msg, nil
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	errDbMsg := ""
+	msg := ""
+	values := []int{}
+
+	credentials, err := parseCredentials()
+	if err != nil {
+		fmt.Printf("parseCredentials error = %v\n", err)
+		panic(err)
+	}
+
+	httpMsg, err := httpGetRequest(credentials)
+	if err != nil {
+		errDbMsg += fmt.Sprintf("HTTP GET request failed: %s\n", err.Error())
+	}
+	msg += httpMsg
+
 	client, err := elastic.NewClient(
-		elastic.SetURL(u),
+		elastic.SetURL(credentials.Host),
 		elastic.SetMaxRetries(10),
-		elastic.SetBasicAuth(result.Username, result.Password))
+		elastic.SetBasicAuth(credentials.Username, credentials.Password))
 	if err == nil {
 		// Use the IndexExists service to check if a specified index exists.
 		exists, err := client.IndexExists("twitter").Do(context.TODO())
@@ -149,7 +181,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	fmt.Fprintf(w, fmt.Sprintf("err = %v\nerrCfenv = %v\nerrDbMsg = %v\nenv VCAP_SERVICES: %s\nmsg = %v\ncredentials = %v\nvalues = %v", err, errCfenv, errDbMsg, vcapServices, msg, service.Credentials, values))
+	fmt.Fprintf(w, fmt.Sprintf("err = %v\nerrDbMsg = %v\nenv VCAP_SERVICES: %s\nmsg = %v\nvalues = %v", err, errDbMsg, os.Getenv("VCAP_SERVICES"), msg, values))
 }
 
 func main() {
