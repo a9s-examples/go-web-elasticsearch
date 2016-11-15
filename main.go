@@ -108,16 +108,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	httpMsg, err := httpGetRequest(credentials)
-	if err != nil {
-		errDbMsg += fmt.Sprintf("HTTP GET request failed: %s\n", err.Error())
-	}
-	msg += httpMsg
+	//httpMsg, err := httpGetRequest(credentials)
+	//if err != nil {
+	//	errDbMsg += fmt.Sprintf("HTTP GET request failed: %s\n", err.Error())
+	//}
+	//msg += httpMsg
 
 	client, err := elastic.NewClient(
 		elastic.SetURL(credentials.Host),
 		elastic.SetMaxRetries(10),
-		elastic.SetBasicAuth(credentials.Username, credentials.Password))
+		elastic.SetBasicAuth(credentials.Username, credentials.Password),
+		elastic.SetSniff(false))
 	if err == nil {
 		// Use the IndexExists service to check if a specified index exists.
 		exists, err := client.IndexExists("twitter").Do(context.TODO())
