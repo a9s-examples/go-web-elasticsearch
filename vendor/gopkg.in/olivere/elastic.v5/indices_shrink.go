@@ -18,7 +18,7 @@ import (
 // new index with fewer primary shards.
 //
 // For further details, see
-// https://www.elastic.co/guide/en/elasticsearch/reference/5.0/indices-shrink-index.html.
+// https://www.elastic.co/guide/en/elasticsearch/reference/5.2/indices-shrink-index.html.
 type IndicesShrinkService struct {
 	client              *Client
 	pretty              bool
@@ -149,7 +149,7 @@ func (s *IndicesShrinkService) Do(ctx context.Context) (*IndicesShrinkResponse, 
 	var body interface{}
 	if s.bodyJson != nil {
 		body = s.bodyJson
-	} else {
+	} else if s.bodyString != "" {
 		body = s.bodyString
 	}
 
